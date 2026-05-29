@@ -13,9 +13,8 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> Result<(), Box<dyn 
     let icon = icon_to_tauri_image(&icon_img);
 
     let menu = MenuBuilder::new(app)
-        .item(&MenuItemBuilder::with_id("theme_ink_wash", "淡墨水彩").build(app)?)
-        .item(&MenuItemBuilder::with_id("theme_morandi", "莫兰迪雅粉").build(app)?)
-        .item(&MenuItemBuilder::with_id("theme_palace", "赤金宫墙").build(app)?)
+        .item(&MenuItemBuilder::with_id("nav_settings", "偏好").build(app)?)
+        .item(&MenuItemBuilder::with_id("nav_about", "版本").build(app)?)
         .separator()
         .item(&MenuItemBuilder::with_id("quit", "退出").build(app)?)
         .build()?;
@@ -24,17 +23,15 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> Result<(), Box<dyn 
         .icon(icon)
         .tooltip("CC-Day 农历日历")
         .icon_as_template(true)
-        .menu(&menu)
+        .menu(&menu)  // — 待后续扩展右键菜单时恢复
+        .show_menu_on_left_click(false)
         .on_menu_event(|app, event| {
             match event.id().as_ref() {
-                "theme_ink_wash" => {
-                    let _ = app.emit("theme-change", "ink-wash");
+                "nav_settings" => {
+                    let _ = app.emit("navigate-to", "settings");
                 }
-                "theme_morandi" => {
-                    let _ = app.emit("theme-change", "morandi");
-                }
-                "theme_palace" => {
-                    let _ = app.emit("theme-change", "palace");
+                "nav_about" => {
+                    let _ = app.emit("navigate-to", "about");
                 }
                 "quit" => {
                     app.exit(0);
@@ -47,26 +44,22 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> Result<(), Box<dyn 
             match event {
                 TrayIconEvent::Click {
                     button: MouseButton::Left,
-                    button_state: MouseButtonState::Up,
+                    button_state: MouseButtonState::Down,
                     ..
                 } => {
                     if let Some(window) = app.get_webview_window("calendar") {
-                        if window.is_visible().unwrap_or(false) {
-                            let _ = window.hide();
-                        } else {
-                            if let Ok(Some(tray_rect)) = tray.rect() {
-                                let pos: tauri::PhysicalPosition<f64> = tray_rect.position.to_physical(1.0);
-                                let size: tauri::PhysicalSize<f64> = tray_rect.size.to_physical(1.0);
-                                let window_width = 320.0;
-                                let x = (pos.x as f64 + size.width as f64 / 2.0) - window_width / 2.0;
-                                let y = pos.y as f64 + size.height as f64 + 4.0;
-                                let _ = window.set_position(tauri::Position::Physical(
-                                    tauri::PhysicalPosition::new(x as i32, y as i32),
-                                ));
-                            }
-                            let _ = window.show();
-                            let _ = window.set_focus();
+                        if let Ok(Some(tray_rect)) = tray.rect() {
+                            let pos: tauri::PhysicalPosition<f64> = tray_rect.position.to_physical(1.0);
+                            let size: tauri::PhysicalSize<f64> = tray_rect.size.to_physical(1.0);
+                            let window_width = 320.0;
+                            let x = (pos.x as f64 + size.width as f64 / 2.0) - window_width / 2.0;
+                            let y = pos.y as f64 + size.height as f64 + 4.0;
+                            let _ = window.set_position(tauri::Position::Physical(
+                                tauri::PhysicalPosition::new(x as i32, y as i32),
+                            ));
                         }
+                        let _ = window.show();
+                        let _ = window.set_focus();
                     }
                 }
                 _ => {}
