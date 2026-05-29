@@ -2,12 +2,19 @@ mod tray;
 mod icon;
 mod show_guard;
 
+#[cfg(target_os = "macos")]
+#[macro_use]
+extern crate objc;
+
 use chrono::{Datelike, Local, Timelike};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
-use tauri::{WebviewUrl, WebviewWindowBuilder};
+use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
 
 use crate::icon::{generate_date_icon, icon_to_tauri_image};
+use crate::show_guard::IsShowingFlag;
 
 #[tauri::command]
 fn get_app_version() -> String {
@@ -33,12 +40,37 @@ pub fn run() {
             .always_on_top(true)
             .visible(false)
             .resizable(false)
+            .visible_on_all_workspaces(true)
             .build()?;
 
+            #[cfg(target_os = "macos")]
+            {
+                let ns_window: cocoa::base::id = window.ns_window().unwrap() as _;
+                unsafe {
+                    let behavior: cocoa::foundation::NSUInteger =
+                        msg_send![ns_window, collectionBehavior];
+                    let full_screen_aux: cocoa::foundation::NSUInteger = 1 << 8;
+                    let new_behavior = behavior | full_screen_aux;
+                    let _: () = msg_send![ns_window, setCollectionBehavior: new_behavior];
+                }
+            }
+
+            let is_showing = Arc::new(AtomicBool::new(false));
+            app.manage(IsShowingFlag(is_showing.clone()));
+
             let window_clone = window.clone();
+            let flag_for_event = is_showing.clone();
             window.on_window_event(move |event| {
-                if let tauri::WindowEvent::Focused(false) = event {
-                    let _ = window_clone.hide();
+                match event {
+                    tauri::WindowEvent::Focused(false) => {
+                        if !flag_for_event.load(Ordering::SeqCst) {
+                            let _ = window_clone.hide();
+                        }
+                    }
+                    tauri::WindowEvent::Focused(true) => {
+                        flag_for_event.store(false, Ordering::SeqCst);
+                    }
+                    _ => {}
                 }
             });
 

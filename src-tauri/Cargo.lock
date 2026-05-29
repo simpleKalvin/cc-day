@@ -555,6 +555,7 @@ dependencies = [
  "chrono",
  "cocoa",
  "image",
+ "objc",
  "serde",
  "serde_json",
  "tauri",
