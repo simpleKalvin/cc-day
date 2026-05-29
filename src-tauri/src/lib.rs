@@ -1,5 +1,6 @@
 mod tray;
 mod icon;
+mod show_guard;
 
 use chrono::{Datelike, Local, Timelike};
 use std::thread;
