@@ -58,6 +58,9 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> Result<(), Box<dyn 
                                 tauri::PhysicalPosition::new(x as i32, y as i32),
                             ));
                         }
+                        if let Some(flag) = app.try_state::<crate::show_guard::IsShowingFlag>() {
+                            flag.will_show();
+                        }
                         let _ = window.show();
                         let _ = window.set_focus();
                     }
