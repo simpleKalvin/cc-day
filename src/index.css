@@ -79,9 +79,9 @@
   --festival: #c4342e;
   --festival-bg: rgba(196, 52, 46, 0.08);
   --festival-border: rgba(196, 52, 46, 0.15);
-  --jieqi: #5a8a5a;
-  --jieqi-bg: rgba(90, 138, 90, 0.08);
-  --jieqi-border: rgba(90, 138, 90, 0.15);
+  --jieqi: #d4b060;
+  --jieqi-bg: rgba(200, 164, 74, 0.15);
+  --jieqi-border: rgba(200, 164, 74, 0.25);
   --weekend: #a06050;
   --divider: rgba(200, 164, 74, 0.15);
   --today-bg: rgba(196, 52, 46, 0.06);

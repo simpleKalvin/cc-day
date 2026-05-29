@@ -27,8 +27,7 @@ export function DayDetail({ day }: DayDetailProps) {
     <div className="detail-header">
       <div className="solar-date">{solarDateStr}</div>
       <div className="lunar-date">
-        {day.lunarMonthName}
-        {day.lunarDayName}
+        {day.lunarMonthName}·{day.lunarDayName}
       </div>
       <div className="ganzhi">{ganzhiStr}</div>
       {tags.length > 0 && (
