@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;700;900&family=LXGW+WenKai:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    min-height:100vh;
+    background: #e0dcd4;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 30px 20px 40px;
+    font-family: 'Noto Sans SC', sans-serif;
+  }
+  h1 { font-size:20px; color:#555; margin-bottom:6px; letter-spacing:2px; }
+  .subtitle { font-size:12px; color:#999; margin-bottom:28px; letter-spacing:1px; }
+  .row {
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+    max-width: 1080px;
+  }
+  .col { display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .col-label {
+    font-size:13px; font-weight:600; letter-spacing:1px;
+  }
+
+  /* ═══════ Shared Card Frame ═══════ */
+  .app-frame {
+    width: 310px;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+  }
+
+  /* ── Grid common ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    text-align: center;
+  }
+  .day-cell {
+    padding: 4px 0;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+  }
+  .day-num { font-size:12px; font-weight:500; line-height:1.4; }
+  .day-lunar { font-size:7.5px; line-height:1.2; }
+  .weekday { font-size:9px; padding-bottom:6px; letter-spacing:1px; font-weight:500; }
+  .month-nav {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:10px; padding: 0 2px;
+  }
+  .nav-btn {
+    width:26px; height:26px; border-radius:6px;
+    background:transparent; font-size:10px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    border: 1px solid rgba(128,128,128,0.15);
+    transition: all 0.2s;
+  }
+  .month-title { font-size:13px; font-weight:700; letter-spacing:1px; }
+  .tags { display:flex; gap:4px; flex-wrap:wrap; }
+  .tag { font-size:9px; padding:2px 8px; border-radius:4px; font-weight:600; letter-spacing:0.3px; }
+  .divider { height:1px; }
+
+  /* ═══════════════════════════════════
+     A. 淡墨水彩（当前方案）
+     ═══════════════════════════════════ */
+  .scheme-a { --bg:#f8f5ef; --bg2:#f0ebe0; --header1:#e8e2d4; --header2:#f2ece0; --ink:#2c2c3a;
+    --gold:#a67c52; --muted:#aaa8a0; --sec:#7a7a8a; --red:#c45a5a; --green:#4a7a5a; --weekend:#b07060;
+    --div:rgba(166,124,82,0.12); --today-bg:rgba(166,124,82,0.08); --today-bd:rgba(166,124,82,0.25);
+  }
+  .scheme-a .col-label { color: var(--gold); }
+  .scheme-a .detail-header {
+    background: radial-gradient(ellipse at 20% 30%, rgba(166,124,82,0.06) 0%, transparent 60%),
+                linear-gradient(160deg, var(--header1), var(--header2));
+    padding:16px 16px 14px; color:var(--ink);
+  }
+  .scheme-a .solar-date { font-size:11px; color:var(--sec); margin-bottom:5px; }
+  .scheme-a .lunar-date { font-family:'Noto Serif SC',serif; font-size:24px; font-weight:900; letter-spacing:2px; margin-bottom:2px; }
+  .scheme-a .ganzhi { font-size:11px; font-weight:300; color:var(--sec); letter-spacing:1px; margin-bottom:8px; }
+  .scheme-a .tag-jieqi { background:rgba(74,122,90,0.08); color:var(--green); border:1px solid rgba(74,122,90,0.15); }
+  .scheme-a .tag-yi { background:rgba(166,124,82,0.1); color:var(--gold); border:1px solid rgba(166,124,82,0.15); }
+  .scheme-a .divider { background:linear-gradient(90deg,transparent,var(--div) 30%,var(--div) 70%,transparent); }
+  .scheme-a .calendar { background:var(--bg); padding:12px 14px 14px; }
+  .scheme-a .nav-btn { color:var(--muted); }
+  .scheme-a .nav-btn:hover { border-color:var(--gold); color:var(--gold); }
+  .scheme-a .month-title { color:var(--ink); font-family:'Noto Serif SC',serif; }
+  .scheme-a .weekday { color:var(--muted); }
+  .scheme-a .weekday.wknd { color:var(--weekend); opacity:0.55; }
+  .scheme-a .day-num { color:var(--ink); }
+  .scheme-a .day-cell.wknd .day-num { color:var(--weekend); }
+  .scheme-a .day-cell.other .day-num { color:var(--muted); }
+  .scheme-a .day-cell.today { background:var(--today-bg); border-color:var(--today-bd); }
+  .scheme-a .day-cell.today .day-num { color:var(--gold); font-weight:700; }
+  .scheme-a .day-cell.today .day-lunar { color:var(--gold); opacity:0.8; }
+  .scheme-a .day-lunar { color:var(--muted); }
+  .scheme-a .day-cell.fest .day-lunar { color:var(--red); }
+  .scheme-a .day-cell.jq .day-lunar { color:var(--green); }
+  .scheme-a .day-cell.other .day-lunar { opacity:0.5; }
+  .scheme-a .footer { background:var(--bg2); padding:8px 16px; display:flex; justify-content:space-between; align-items:center; }
+  .scheme-a .footer-info { font-size:9px; color:var(--muted); }
+  .scheme-a .today-btn { font-size:9px; color:var(--gold); background:rgba(166,124,82,0.08); border:1px solid rgba(166,124,82,0.12); border-radius:4px; padding:2px 8px; cursor:pointer; }
+
+  /* ═══════════════════════════════════
+     B. 莫兰迪雅粉
+     ═══════════════════════════════════ */
+  .scheme-b { --bg:#f4efe8; --bg2:#ece5db; --header1:#e8dcd2; --header2:#f0e8de; --ink:#4a4240;
+    --accent:#b07080; --accent2:#c89898; --muted:#b0a89e; --sec:#8a8078; --red:#c47070; --green:#7a9a7a; --weekend:#a08878;
+    --div:rgba(176,112,128,0.12); --today-bg:rgba(176,112,128,0.08); --today-bd:rgba(176,112,128,0.25);
+  }
+  .scheme-b .col-label { color: var(--accent); }
+  .scheme-b .detail-header {
+    background: radial-gradient(ellipse at 70% 40%, rgba(200,152,152,0.1) 0%, transparent 60%),
+                radial-gradient(ellipse at 20% 80%, rgba(160,180,200,0.06) 0%, transparent 60%),
+                linear-gradient(160deg, var(--header1), var(--header2));
+    padding:16px 16px 14px; color:var(--ink);
+  }
+  .scheme-b .solar-date { font-size:11px; color:var(--sec); margin-bottom:5px; }
+  .scheme-b .lunar-date { font-family:'Noto Serif SC',serif; font-size:24px; font-weight:900; letter-spacing:2px; color:var(--accent); margin-bottom:2px; }
+  .scheme-b .ganzhi { font-size:11px; font-weight:300; color:var(--sec); letter-spacing:1px; margin-bottom:8px; }
+  .scheme-b .tag-jieqi { background:rgba(122,154,122,0.1); color:var(--green); border:1px solid rgba(122,154,122,0.15); }
+  .scheme-b .tag-yi { background:rgba(176,112,128,0.1); color:var(--accent); border:1px solid rgba(176,112,128,0.15); }
+  .scheme-b .divider { background:linear-gradient(90deg,transparent,var(--div) 30%,var(--div) 70%,transparent); }
+  .scheme-b .calendar { background:var(--bg); padding:12px 14px 14px; }
+  .scheme-b .nav-btn { color:var(--muted); }
+  .scheme-b .nav-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .scheme-b .month-title { color:var(--ink); font-family:'Noto Serif SC',serif; }
+  .scheme-b .weekday { color:var(--muted); }
+  .scheme-b .weekday.wknd { color:var(--weekend); opacity:0.6; }
+  .scheme-b .day-num { color:var(--ink); }
+  .scheme-b .day-cell.wknd .day-num { color:var(--weekend); }
+  .scheme-b .day-cell.other .day-num { color:var(--muted); }
+  .scheme-b .day-cell.today { background:var(--today-bg); border-color:var(--today-bd); }
+  .scheme-b .day-cell.today .day-num { color:var(--accent); font-weight:700; }
+  .scheme-b .day-cell.today .day-lunar { color:var(--accent); opacity:0.8; }
+  .scheme-b .day-lunar { color:var(--muted); }
+  .scheme-b .day-cell.fest .day-lunar { color:var(--red); }
+  .scheme-b .day-cell.jq .day-lunar { color:var(--green); }
+  .scheme-b .day-cell.other .day-lunar { opacity:0.5; }
+  .scheme-b .footer { background:var(--bg2); padding:8px 16px; display:flex; justify-content:space-between; align-items:center; }
+  .scheme-b .footer-info { font-size:9px; color:var(--muted); }
+  .scheme-b .today-btn { font-size:9px; color:var(--accent); background:rgba(176,112,128,0.08); border:1px solid rgba(176,112,128,0.12); border-radius:4px; padding:2px 8px; cursor:pointer; }
+
+  /* ═══════════════════════════════════
+     C. 赤金宫墙
+     ═══════════════════════════════════ */
+  .scheme-c { --bg:#faf6f0; --bg2:#f2ebe0; --header1:#c4342e; --header2:#d44838; --ink:#3a2a20;
+    --accent:#c4342e; --gold:#c8a44a; --muted:#b0a898; --sec:#8a7a6a; --red:#c4342e; --green:#5a8a5a; --weekend:#a06050;
+    --div:rgba(200,164,74,0.15); --today-bg:rgba(196,52,46,0.06); --today-bd:rgba(196,52,46,0.2);
+  }
+  .scheme-c .col-label { color: var(--accent); }
+  .scheme-c .detail-header {
+    background: linear-gradient(160deg, var(--header1), var(--header2));
+    padding:16px 16px 14px; color:#fff;
+  }
+  .scheme-c .solar-date { font-size:11px; color:rgba(255,255,255,0.75); margin-bottom:5px; }
+  .scheme-c .lunar-date { font-family:'Noto Serif SC',serif; font-size:24px; font-weight:900; letter-spacing:2px; color:#fff; margin-bottom:2px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  }
+  .scheme-c .ganzhi { font-size:11px; font-weight:300; color:rgba(255,255,255,0.8); letter-spacing:1px; margin-bottom:8px; }
+  .scheme-c .tag-jieqi { background:rgba(255,255,255,0.15); color:#fff; border:1px solid rgba(255,255,255,0.2); backdrop-filter:blur(4px); }
+  .scheme-c .tag-yi { background:rgba(200,164,74,0.25); color:var(--gold); border:1px solid rgba(200,164,74,0.35); }
+  .scheme-c .divider { background:linear-gradient(90deg,transparent,var(--div) 30%,var(--div) 70%,transparent); }
+  .scheme-c .calendar { background:var(--bg); padding:12px 14px 14px; }
+  .scheme-c .nav-btn { color:var(--muted); }
+  .scheme-c .nav-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .scheme-c .month-title { color:var(--ink); font-family:'Noto Serif SC',serif; }
+  .scheme-c .weekday { color:var(--muted); }
+  .scheme-c .weekday.wknd { color:var(--weekend); opacity:0.6; }
+  .scheme-c .day-num { color:var(--ink); }
+  .scheme-c .day-cell.wknd .day-num { color:var(--weekend); }
+  .scheme-c .day-cell.other .day-num { color:var(--muted); }
+  .scheme-c .day-cell.today { background:var(--today-bg); border-color:var(--today-bd); }
+  .scheme-c .day-cell.today .day-num { color:var(--accent); font-weight:700; }
+  .scheme-c .day-cell.today .day-lunar { color:var(--accent); opacity:0.8; }
+  .scheme-c .day-lunar { color:var(--muted); }
+  .scheme-c .day-cell.fest .day-lunar { color:var(--red); }
+  .scheme-c .day-cell.jq .day-lunar { color:var(--green); }
+  .scheme-c .day-cell.other .day-lunar { opacity:0.5; }
+  .scheme-c .footer { background:var(--bg2); padding:8px 16px; display:flex; justify-content:space-between; align-items:center; }
+  .scheme-c .footer-info { font-size:9px; color:var(--muted); }
+  .scheme-c .today-btn { font-size:9px; color:var(--accent); background:rgba(196,52,46,0.06); border:1px solid rgba(196,52,46,0.12); border-radius:4px; padding:2px 8px; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<h1>三套配色方案对比</h1>
+<p class="subtitle">点击选择你喜欢的方案</p>
+
+<div class="row">
+  <!-- ════ A. 淡墨水彩 ════ -->
+  <div class="col">
+    <div class="col-label">A. 淡墨水彩</div>
+    <div class="app-frame scheme-a">
+      <div class="detail-header">
+        <div class="solar-date">2026年5月29日 星期五</div>
+        <div class="lunar-date">五月初三</div>
+        <div class="ganzhi">丙午年 癸巳月 戊申日</div>
+        <div class="tags">
+          <span class="tag tag-jieqi">芒种将至</span>
+          <span class="tag tag-yi">宜 · 纳采</span>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="calendar">
+        <div class="month-nav">
+          <button class="nav-btn">◀</button>
+          <span class="month-title">2026年5月</span>
+          <button class="nav-btn">▶</button>
+        </div>
+        <div class="grid">
+          <div class="weekday">日</div><div class="weekday">一</div><div class="weekday">二</div><div class="weekday">三</div><div class="weekday">四</div><div class="weekday">五</div><div class="weekday wknd">六</div>
+          <div class="day-cell other"><div class="day-num">26</div><div class="day-lunar">廿九</div></div>
+          <div class="day-cell other"><div class="day-num">27</div><div class="day-lunar">三十</div></div>
+          <div class="day-cell other"><div class="day-num">28</div><div class="day-lunar">初一</div></div>
+          <div class="day-cell other"><div class="day-num">29</div><div class="day-lunar">初二</div></div>
+          <div class="day-cell other"><div class="day-num">30</div><div class="day-lunar">初三</div></div>
+          <div class="day-cell fest"><div class="day-num">1</div><div class="day-lunar">劳动节</div></div>
+          <div class="day-cell wknd"><div class="day-num">2</div><div class="day-lunar">初六</div></div>
+          <div class="day-cell wknd"><div class="day-num">3</div><div class="day-lunar">初七</div></div>
+          <div class="day-cell fest"><div class="day-num">4</div><div class="day-lunar">青年节</div></div>
+          <div class="day-cell jq"><div class="day-num">5</div><div class="day-lunar">立夏</div></div>
+          <div class="day-cell"><div class="day-num">6</div><div class="day-lunar">初十</div></div>
+          <div class="day-cell"><div class="day-num">7</div><div class="day-lunar">十一</div></div>
+          <div class="day-cell"><div class="day-num">8</div><div class="day-lunar">十二</div></div>
+          <div class="day-cell wknd"><div class="day-num">9</div><div class="day-lunar">十三</div></div>
+          <div class="day-cell wknd"><div class="day-num">10</div><div class="day-lunar">十四</div></div>
+          <div class="day-cell"><div class="day-num">11</div><div class="day-lunar">十五</div></div>
+          <div class="day-cell"><div class="day-num">12</div><div class="day-lunar">十六</div></div>
+          <div class="day-cell"><div class="day-num">13</div><div class="day-lunar">十七</div></div>
+          <div class="day-cell"><div class="day-num">14</div><div class="day-lunar">十八</div></div>
+          <div class="day-cell"><div class="day-num">15</div><div class="day-lunar">十九</div></div>
+          <div class="day-cell wknd"><div class="day-num">16</div><div class="day-lunar">二十</div></div>
+          <div class="day-cell wknd"><div class="day-num">17</div><div class="day-lunar">廿一</div></div>
+          <div class="day-cell"><div class="day-num">18</div><div class="day-lunar">廿二</div></div>
+          <div class="day-cell"><div class="day-num">19</div><div class="day-lunar">廿三</div></div>
+          <div class="day-cell"><div class="day-num">20</div><div class="day-lunar">廿四</div></div>
+          <div class="day-cell jq"><div class="day-num">21</div><div class="day-lunar">小满</div></div>
+          <div class="day-cell"><div class="day-num">22</div><div class="day-lunar">廿六</div></div>
+          <div class="day-cell wknd"><div class="day-num">23</div><div class="day-lunar">廿七</div></div>
+          <div class="day-cell wknd"><div class="day-num">24</div><div class="day-lunar">廿八</div></div>
+          <div class="day-cell"><div class="day-num">25</div><div class="day-lunar">廿九</div></div>
+          <div class="day-cell"><div class="day-num">26</div><div class="day-lunar">三十</div></div>
+          <div class="day-cell"><div class="day-num">27</div><div class="day-lunar">初一</div></div>
+          <div class="day-cell"><div class="day-num">28</div><div class="day-lunar">初二</div></div>
+          <div class="day-cell today"><div class="day-num">29</div><div class="day-lunar">初三</div></div>
+          <div class="day-cell wknd"><div class="day-num">30</div><div class="day-lunar">初四</div></div>
+          <div class="day-cell wknd"><div class="day-num">31</div><div class="day-lunar">初五</div></div>
+          <div class="day-cell other"><div class="day-num">1</div><div class="day-lunar">初六</div></div>
+          <div class="day-cell other"><div class="day-num">2</div><div class="day-lunar">初七</div></div>
+          <div class="day-cell other"><div class="day-num">3</div><div class="day-lunar">初八</div></div>
+          <div class="day-cell other"><div class="day-num">4</div><div class="day-lunar">初九</div></div>
+          <div class="day-cell other jq"><div class="day-num">5</div><div class="day-lunar">芒种</div></div>
+          <div class="day-cell other"><div class="day-num">6</div><div class="day-lunar">十一</div></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="footer">
+        <span class="footer-info">马月 · 丙午</span>
+        <button class="today-btn">回到今天</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ B. 莫兰迪雅粉 ════ -->
+  <div class="col">
+    <div class="col-label">B. 莫兰迪雅粉</div>
+    <div class="app-frame scheme-b">
+      <div class="detail-header">
+        <div class="solar-date">2026年5月29日 星期五</div>
+        <div class="lunar-date">五月初三</div>
+        <div class="ganzhi">丙午年 癸巳月 戊申日</div>
+        <div class="tags">
+          <span class="tag tag-jieqi">芒种将至</span>
+          <span class="tag tag-yi">宜 · 纳采</span>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="calendar">
+        <div class="month-nav">
+          <button class="nav-btn">◀</button>
+          <span class="month-title">2026年5月</span>
+          <button class="nav-btn">▶</button>
+        </div>
+        <div class="grid">
+          <div class="weekday">日</div><div class="weekday">一</div><div class="weekday">二</div><div class="weekday">三</div><div class="weekday">四</div><div class="weekday">五</div><div class="weekday wknd">六</div>
+          <div class="day-cell other"><div class="day-num">26</div><div class="day-lunar">廿九</div></div>
+          <div class="day-cell other"><div class="day-num">27</div><div class="day-lunar">三十</div></div>
+          <div class="day-cell other"><div class="day-num">28</div><div class="day-lunar">初一</div></div>
+          <div class="day-cell other"><div class="day-num">29</div><div class="day-lunar">初二</div></div>
+          <div class="day-cell other"><div class="day-num">30</div><div class="day-lunar">初三</div></div>
+          <div class="day-cell fest"><div class="day-num">1</div><div class="day-lunar">劳动节</div></div>
+          <div class="day-cell wknd"><div class="day-num">2</div><div class="day-lunar">初六</div></div>
+          <div class="day-cell wknd"><div class="day-num">3</div><div class="day-lunar">初七</div></div>
+          <div class="day-cell fest"><div class="day-num">4</div><div class="day-lunar">青年节</div></div>
+          <div class="day-cell jq"><div class="day-num">5</div><div class="day-lunar">立夏</div></div>
+          <div class="day-cell"><div class="day-num">6</div><div class="day-lunar">初十</div></div>
+          <div class="day-cell"><div class="day-num">7</div><div class="day-lunar">十一</div></div>
+          <div class="day-cell"><div class="day-num">8</div><div class="day-lunar">十二</div></div>
+          <div class="day-cell wknd"><div class="day-num">9</div><div class="day-lunar">十三</div></div>
+          <div class="day-cell wknd"><div class="day-num">10</div><div class="day-lunar">十四</div></div>
+          <div class="day-cell"><div class="day-num">11</div><div class="day-lunar">十五</div></div>
+          <div class="day-cell"><div class="day-num">12</div><div class="day-lunar">十六</div></div>
+          <div class="day-cell"><div class="day-num">13</div><div class="day-lunar">十七</div></div>
+          <div class="day-cell"><div class="day-num">14</div><div class="day-lunar">十八</div></div>
+          <div class="day-cell"><div class="day-num">15</div><div class="day-lunar">十九</div></div>
+          <div class="day-cell wknd"><div class="day-num">16</div><div class="day-lunar">二十</div></div>
+          <div class="day-cell wknd"><div class="day-num">17</div><div class="day-lunar">廿一</div></div>
+          <div class="day-cell"><div class="day-num">18</div><div class="day-lunar">廿二</div></div>
+          <div class="day-cell"><div class="day-num">19</div><div class="day-lunar">廿三</div></div>
+          <div class="day-cell"><div class="day-num">20</div><div class="day-lunar">廿四</div></div>
+          <div class="day-cell jq"><div class="day-num">21</div><div class="day-lunar">小满</div></div>
+          <div class="day-cell"><div class="day-num">22</div><div class="day-lunar">廿六</div></div>
+          <div class="day-cell wknd"><div class="day-num">23</div><div class="day-lunar">廿七</div></div>
+          <div class="day-cell wknd"><div class="day-num">24</div><div class="day-lunar">廿八</div></div>
+          <div class="day-cell"><div class="day-num">25</div><div class="day-lunar">廿九</div></div>
+          <div class="day-cell"><div class="day-num">26</div><div class="day-lunar">三十</div></div>
+          <div class="day-cell"><div class="day-num">27</div><div class="day-lunar">初一</div></div>
+          <div class="day-cell"><div class="day-num">28</div><div class="day-lunar">初二</div></div>
+          <div class="day-cell today"><div class="day-num">29</div><div class="day-lunar">初三</div></div>
+          <div class="day-cell wknd"><div class="day-num">30</div><div class="day-lunar">初四</div></div>
+          <div class="day-cell wknd"><div class="day-num">31</div><div class="day-lunar">初五</div></div>
+          <div class="day-cell other"><div class="day-num">1</div><div class="day-lunar">初六</div></div>
+          <div class="day-cell other"><div class="day-num">2</div><div class="day-lunar">初七</div></div>
+          <div class="day-cell other"><div class="day-num">3</div><div class="day-lunar">初八</div></div>
+          <div class="day-cell other"><div class="day-num">4</div><div class="day-lunar">初九</div></div>
+          <div class="day-cell other jq"><div class="day-num">5</div><div class="day-lunar">芒种</div></div>
+          <div class="day-cell other"><div class="day-num">6</div><div class="day-lunar">十一</div></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="footer">
+        <span class="footer-info">马月 · 丙午</span>
+        <button class="today-btn">回到今天</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ C. 赤金宫墙 ════ -->
+  <div class="col">
+    <div class="col-label">C. 赤金宫墙</div>
+    <div class="app-frame scheme-c">
+      <div class="detail-header">
+        <div class="solar-date">2026年5月29日 星期五</div>
+        <div class="lunar-date">五月初三</div>
+        <div class="ganzhi">丙午年 癸巳月 戊申日</div>
+        <div class="tags">
+          <span class="tag tag-jieqi">芒种将至</span>
+          <span class="tag tag-yi">宜 · 纳采</span>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="calendar">
+        <div class="month-nav">
+          <button class="nav-btn">◀</button>
+          <span class="month-title">2026年5月</span>
+          <button class="nav-btn">▶</button>
+        </div>
+        <div class="grid">
+          <div class="weekday">日</div><div class="weekday">一</div><div class="weekday">二</div><div class="weekday">三</div><div class="weekday">四</div><div class="weekday">五</div><div class="weekday wknd">六</div>
+          <div class="day-cell other"><div class="day-num">26</div><div class="day-lunar">廿九</div></div>
+          <div class="day-cell other"><div class="day-num">27</div><div class="day-lunar">三十</div></div>
+          <div class="day-cell other"><div class="day-num">28</div><div class="day-lunar">初一</div></div>
+          <div class="day-cell other"><div class="day-num">29</div><div class="day-lunar">初二</div></div>
+          <div class="day-cell other"><div class="day-num">30</div><div class="day-lunar">初三</div></div>
+          <div class="day-cell fest"><div class="day-num">1</div><div class="day-lunar">劳动节</div></div>
+          <div class="day-cell wknd"><div class="day-num">2</div><div class="day-lunar">初六</div></div>
+          <div class="day-cell wknd"><div class="day-num">3</div><div class="day-lunar">初七</div></div>
+          <div class="day-cell fest"><div class="day-num">4</div><div class="day-lunar">青年节</div></div>
+          <div class="day-cell jq"><div class="day-num">5</div><div class="day-lunar">立夏</div></div>
+          <div class="day-cell"><div class="day-num">6</div><div class="day-lunar">初十</div></div>
+          <div class="day-cell"><div class="day-num">7</div><div class="day-lunar">十一</div></div>
+          <div class="day-cell"><div class="day-num">8</div><div class="day-lunar">十二</div></div>
+          <div class="day-cell wknd"><div class="day-num">9</div><div class="day-lunar">十三</div></div>
+          <div class="day-cell wknd"><div class="day-num">10</div><div class="day-lunar">十四</div></div>
+          <div class="day-cell"><div class="day-num">11</div><div class="day-lunar">十五</div></div>
+          <div class="day-cell"><div class="day-num">12</div><div class="day-lunar">十六</div></div>
+          <div class="day-cell"><div class="day-num">13</div><div class="day-lunar">十七</div></div>
+          <div class="day-cell"><div class="day-num">14</div><div class="day-lunar">十八</div></div>
+          <div class="day-cell"><div class="day-num">15</div><div class="day-lunar">十九</div></div>
+          <div class="day-cell wknd"><div class="day-num">16</div><div class="day-lunar">二十</div></div>
+          <div class="day-cell wknd"><div class="day-num">17</div><div class="day-lunar">廿一</div></div>
+          <div class="day-cell"><div class="day-num">18</div><div class="day-lunar">廿二</div></div>
+          <div class="day-cell"><div class="day-num">19</div><div class="day-lunar">廿三</div></div>
+          <div class="day-cell"><div class="day-num">20</div><div class="day-lunar">廿四</div></div>
+          <div class="day-cell jq"><div class="day-num">21</div><div class="day-lunar">小满</div></div>
+          <div class="day-cell"><div class="day-num">22</div><div class="day-lunar">廿六</div></div>
+          <div class="day-cell wknd"><div class="day-num">23</div><div class="day-lunar">廿七</div></div>
+          <div class="day-cell wknd"><div class="day-num">24</div><div class="day-lunar">廿八</div></div>
+          <div class="day-cell"><div class="day-num">25</div><div class="day-lunar">廿九</div></div>
+          <div class="day-cell"><div class="day-num">26</div><div class="day-lunar">三十</div></div>
+          <div class="day-cell"><div class="day-num">27</div><div class="day-lunar">初一</div></div>
+          <div class="day-cell"><div class="day-num">28</div><div class="day-lunar">初二</div></div>
+          <div class="day-cell today"><div class="day-num">29</div><div class="day-lunar">初三</div></div>
+          <div class="day-cell wknd"><div class="day-num">30</div><div class="day-lunar">初四</div></div>
+          <div class="day-cell wknd"><div class="day-num">31</div><div class="day-lunar">初五</div></div>
+          <div class="day-cell other"><div class="day-num">1</div><div class="day-lunar">初六</div></div>
+          <div class="day-cell other"><div class="day-num">2</div><div class="day-lunar">初七</div></div>
+          <div class="day-cell other"><div class="day-num">3</div><div class="day-lunar">初八</div></div>
+          <div class="day-cell other"><div class="day-num">4</div><div class="day-lunar">初九</div></div>
+          <div class="day-cell other jq"><div class="day-num">5</div><div class="day-lunar">芒种</div></div>
+          <div class="day-cell other"><div class="day-num">6</div><div class="day-lunar">十一</div></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="footer">
+        <span class="footer-info">马月 · 丙午</span>
+        <button class="today-btn">回到今天</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Color swatches legend -->
+<div style="margin-top:30px; display:flex; gap:40px; justify-content:center; flex-wrap:wrap;">
+  <div style="text-align:center;">
+    <div style="font-size:12px;color:#a67c52;font-weight:600;margin-bottom:8px;">A. 淡墨水彩</div>
+    <div style="display:flex;gap:4px;justify-content:center;">
+      <span style="background:#f8f5ef;width:18px;height:18px;border-radius:3px;border:1px solid #ddd;"></span>
+      <span style="background:#e8e2d4;width:18px;height:18px;border-radius:3px;border:1px solid #ddd;"></span>
+      <span style="background:#a67c52;width:18px;height:18px;border-radius:3px;border:1px solid #ddd;"></span>
+      <span style="background:#2c2c3a;width:18px;height:18px;border-radius:3px;border:1px solid #ddd;"></span>
+      <span style="background:#4a7a5a;width:18px;height:18px;border-radius:3px;border:1px solid #ddd;"></span>
+    </div>
+  </div>
+  <div style="text-align:center;">
+    <div style="font-size:12px;color:#b07080;font-weight:600;margin-bottom:8px;">B. 莫兰迪雅粉</div>
+    <div style="display:flex;gap:4px;justify-content:center;">
+      <span style="background:#f4efe8;width:18px;height:18px;border-radius:3px;border:1px solid #ddd;"></span>
+      <span style="background:#e8dcd2;width:18px;height:18px;border-radius:3px;border:1px solid #ddd;"></span>
+      <span style="background:#b07080;width:18px;height:18px;border-radius:3px;border:1px solid #ddd;"></span>
+      <span style="background:#4a4240;width:18px;height:18px;border-radius:3px;border:1px solid #ddd;"></span>
+      <span style="background:#7a9a7a;width:18px;height:18px;border-radius:3px;border:1px solid #ddd;"></span>
+    </div>
+  </div>
+  <div style="text-align:center;">
+    <div style="font-size:12px;color:#c4342e;font-weight:600;margin-bottom:8px;">C. 赤金宫墙</div>
+    <div style="display:flex;gap:4px;justify-content:center;">
+      <span style="background:#faf6f0;width:18px;height:18px;border-radius:3px;border:1px solid #ddd;"></span>
+      <span style="background:#c4342e;width:18px;height:18px;border-radius:3px;border:1px solid #ddd;"></span>
+      <span style="background:#c8a44a;width:18px;height:18px;border-radius:3px;border:1px solid #ddd;"></span>
+      <span style="background:#3a2a20;width:18px;height:18px;border-radius:3px;border:1px solid #ddd;"></span>
+      <span style="background:#5a8a5a;width:18px;height:18px;border-radius:3px;border:1px solid #ddd;"></span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

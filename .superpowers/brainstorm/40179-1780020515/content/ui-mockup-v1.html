@@ -1,0 +1,212 @@
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1a1a2e; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+
+  .calendar-popup {
+    width: 340px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  }
+
+  /* 详情区 */
+  .detail-header {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    padding: 16px 18px;
+    color: white;
+  }
+  .detail-header .solar-date {
+    font-size: 13px;
+    opacity: 0.85;
+  }
+  .detail-header .lunar-date {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 4px 0;
+  }
+  .detail-header .ganzhi {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-bottom: 8px;
+  }
+  .detail-header .tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .detail-header .tag {
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(4px);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+  }
+  .detail-header .tag.festival {
+    background: rgba(250, 204, 21, 0.3);
+    color: #fde68a;
+  }
+
+  /* 月历区 */
+  .calendar-body {
+    padding: 14px 16px 16px;
+  }
+  .month-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .month-nav .nav-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: #f3f4f6;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .month-nav .nav-btn:hover {
+    background: #e5e7eb;
+  }
+  .month-nav .month-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #1f2937;
+  }
+
+  .weekday-row, .date-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+  }
+  .weekday-row {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-bottom: 4px;
+    padding: 2px 0;
+  }
+  .date-cell {
+    padding: 4px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .date-cell:hover {
+    background: #f3f4f6;
+  }
+  .date-cell .solar {
+    font-size: 13px;
+    color: #1f2937;
+    line-height: 1.4;
+  }
+  .date-cell .lunar {
+    font-size: 9px;
+    color: #9ca3af;
+    line-height: 1.3;
+  }
+  .date-cell.weekend .solar {
+    color: #6366f1;
+  }
+  .date-cell.today {
+    background: #6366f1;
+  }
+  .date-cell.today .solar {
+    color: white;
+    font-weight: 600;
+  }
+  .date-cell.today .lunar {
+    color: rgba(255,255,255,0.75);
+  }
+  .date-cell.festival .lunar {
+    color: #ef4444;
+    font-weight: 500;
+  }
+  .date-cell.today.festival .lunar {
+    color: rgba(255,255,255,0.9);
+  }
+  .date-cell.other-month .solar {
+    color: #d1d5db;
+  }
+  .date-cell.other-month .lunar {
+    color: #e5e7eb;
+  }
+  .date-cell.solar-term .lunar {
+    color: #22c55e;
+  }
+  .date-cell.today.solar-term .lunar {
+    color: rgba(255,255,255,0.9);
+  }
+</style>
+
+<div class="calendar-popup">
+  <!-- 详情区 -->
+  <div class="detail-header">
+    <div class="solar-date">2026年5月29日 星期五</div>
+    <div class="lunar-date">农历五月初三</div>
+    <div class="ganzhi">丙午年 癸巳月 壬寅日</div>
+    <div class="tags">
+      <span class="tag solar-term">🌿 小满</span>
+      <span class="tag">芒种 6月5日</span>
+    </div>
+  </div>
+
+  <!-- 月历区 -->
+  <div class="calendar-body">
+    <div class="month-nav">
+      <button class="nav-btn">◀</button>
+      <span class="month-title">2026年5月</span>
+      <button class="nav-btn">▶</button>
+    </div>
+    <div class="weekday-row">
+      <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+    </div>
+    <div class="date-grid">
+      <!-- Week 1: May -->
+      <div class="date-cell weekend"><div class="solar">1</div><div class="lunar festival">劳动节</div></div>
+      <div class="date-cell"><div class="solar">2</div><div class="lunar">初七</div></div>
+      <div class="date-cell"><div class="solar">3</div><div class="lunar">初八</div></div>
+      <div class="date-cell"><div class="solar">4</div><div class="lunar">初九</div></div>
+      <div class="date-cell"><div class="solar">5</div><div class="lunar">初十</div></div>
+      <div class="date-cell"><div class="solar">6</div><div class="lunar">十一</div></div>
+      <div class="date-cell weekend"><div class="solar">7</div><div class="lunar">十二</div></div>
+      <!-- Week 2 -->
+      <div class="date-cell weekend"><div class="solar">8</div><div class="lunar">十三</div></div>
+      <div class="date-cell"><div class="solar">9</div><div class="lunar">十四</div></div>
+      <div class="date-cell"><div class="solar">10</div><div class="lunar">十五</div></div>
+      <div class="date-cell"><div class="solar">11</div><div class="lunar">十六</div></div>
+      <div class="date-cell"><div class="solar">12</div><div class="lunar">十七</div></div>
+      <div class="date-cell"><div class="solar">13</div><div class="lunar">十八</div></div>
+      <div class="date-cell weekend"><div class="solar">14</div><div class="lunar">十九</div></div>
+      <!-- Week 3 -->
+      <div class="date-cell weekend"><div class="solar">15</div><div class="lunar">二十</div></div>
+      <div class="date-cell"><div class="solar">16</div><div class="lunar">廿一</div></div>
+      <div class="date-cell"><div class="solar">17</div><div class="lunar">廿二</div></div>
+      <div class="date-cell"><div class="solar">18</div><div class="lunar">廿三</div></div>
+      <div class="date-cell"><div class="solar">19</div><div class="lunar">廿四</div></div>
+      <div class="date-cell"><div class="solar">20</div><div class="lunar solar-term">小满</div></div>
+      <div class="date-cell weekend"><div class="solar">21</div><div class="lunar">廿六</div></div>
+      <!-- Week 4 -->
+      <div class="date-cell weekend"><div class="solar">22</div><div class="lunar">廿七</div></div>
+      <div class="date-cell"><div class="solar">23</div><div class="lunar">廿八</div></div>
+      <div class="date-cell"><div class="solar">24</div><div class="lunar">廿九</div></div>
+      <div class="date-cell"><div class="solar">25</div><div class="lunar">三十</div></div>
+      <div class="date-cell"><div class="solar">26</div><div class="lunar">初一</div></div>
+      <div class="date-cell"><div class="solar">27</div><div class="lunar">初二</div></div>
+      <div class="date-cell weekend"><div class="solar">28</div><div class="lunar">初三</div></div>
+      <!-- Week 5 -->
+      <div class="date-cell weekend today"><div class="solar">29</div><div class="lunar">初四</div></div>
+      <div class="date-cell"><div class="solar">30</div><div class="lunar">初五</div></div>
+      <div class="date-cell"><div class="solar">31</div><div class="lunar">初六</div></div>
+      <div class="date-cell other-month"><div class="solar">1</div><div class="lunar">初七</div></div>
+      <div class="date-cell other-month"><div class="solar">2</div><div class="lunar">初八</div></div>
+      <div class="date-cell other-month"><div class="solar">3</div><div class="lunar">初九</div></div>
+      <div class="date-cell other-month weekend"><div class="solar">4</div><div class="lunar">初十</div></div>
+    </div>
+  </div>
+</div>

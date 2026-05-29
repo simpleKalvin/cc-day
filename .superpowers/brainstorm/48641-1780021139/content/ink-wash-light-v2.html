@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  :root {
+    --bg-body: #e8e3d8;
+    --bg-primary: #f8f5ef;
+    --bg-secondary: #f0ebe0;
+    --bg-header-start: #e8e2d4;
+    --bg-header-end: #f2ece0;
+    --accent-gold: #a67c52;
+    --accent-gold-light: rgba(166,124,82,0.1);
+    --accent-gold-medium: rgba(166,124,82,0.2);
+    --accent-ink: #2c2c3a;
+    --text-primary: #3a3a4a;
+    --text-secondary: #7a7a8a;
+    --text-muted: #aaa8a0;
+    --festival-red: #c45a5a;
+    --festival-red-bg: rgba(196,90,90,0.08);
+    --festival-red-border: rgba(196,90,90,0.15);
+    --jieqi-green: #4a7a5a;
+    --jieqi-green-bg: rgba(74,122,90,0.08);
+    --jieqi-green-border: rgba(74,122,90,0.15);
+    --weekend-color: #b07060;
+    --divider: rgba(166,124,82,0.12);
+    --today-bg: rgba(166,124,82,0.08);
+    --today-border: rgba(166,124,82,0.25);
+    --hover-bg: rgba(166,124,82,0.05);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+    --shadow-md: 0 8px 30px rgba(0,0,0,0.08);
+  }
+
+  body {
+    display:flex; align-items:center; justify-content:center;
+    min-height:100vh; background: var(--bg-body);
+    font-family: 'Noto Sans SC', sans-serif;
+  }
+
+  .app-frame {
+    width: 320px;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md), 0 0 0 1px rgba(166,124,82,0.06);
+    background: var(--bg-primary);
+  }
+
+  /* ── Detail Header ── */
+  .detail-header {
+    background:
+      radial-gradient(ellipse at 20% 30%, rgba(166,124,82,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 70%, rgba(100,130,160,0.05) 0%, transparent 60%),
+      linear-gradient(160deg, var(--bg-header-start) 0%, var(--bg-header-end) 100%);
+    padding: 20px 20px 18px;
+    position: relative;
+  }
+
+  /* subtle ink wash blob */
+  .detail-header::before {
+    content: "";
+    position: absolute; top: -40px; right: -20px;
+    width: 140px; height: 140px;
+    background: radial-gradient(circle, rgba(100,130,160,0.06) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .solar-date {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .lunar-date {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--accent-ink);
+    letter-spacing: 3px;
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+
+  .ganzhi {
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--text-secondary);
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+  }
+
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .tag {
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 5px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  .tag-jieqi {
+    background: var(--jieqi-green-bg);
+    color: var(--jieqi-green);
+    border: 1px solid var(--jieqi-green-border);
+  }
+  .tag-festival {
+    background: var(--festival-red-bg);
+    color: var(--festival-red);
+    border: 1px solid var(--festival-red-border);
+  }
+  .tag-yi {
+    background: var(--accent-gold-light);
+    color: var(--accent-gold);
+    border: 1px solid rgba(166,124,82,0.15);
+  }
+
+  /* ── Divider ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--divider) 30%, var(--divider) 70%, transparent);
+  }
+
+  /* ── Calendar Section ── */
+  .calendar {
+    background: var(--bg-primary);
+    padding: 14px 16px 16px;
+  }
+
+  .month-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .nav-btn {
+    width: 28px; height: 28px;
+    border: 1px solid var(--divider);
+    border-radius: 7px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 11px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover {
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+    background: var(--accent-gold-light);
+  }
+
+  .month-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent-ink);
+    letter-spacing: 1px;
+  }
+
+  /* ── Grid ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    text-align: center;
+  }
+
+  .weekday {
+    font-size: 10px;
+    color: var(--text-muted);
+    padding-bottom: 8px;
+    letter-spacing: 1px;
+    font-weight: 500;
+  }
+  .weekday.weekend { color: var(--weekend-color); opacity: 0.6; }
+
+  .day-cell {
+    padding: 5px 0;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+  }
+  .day-cell:hover { background: var(--hover-bg); }
+  .day-cell.today {
+    background: var(--today-bg);
+    border-color: var(--today-border);
+  }
+  .day-cell.selected {
+    background: var(--accent-gold-medium);
+    border-color: var(--accent-gold);
+  }
+
+  .day-num {
+    font-size: 13px;
+    color: var(--text-primary);
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  .day-cell.weekend .day-num { color: var(--weekend-color); }
+  .day-cell.other-month .day-num { color: var(--text-muted); }
+  .day-cell.today .day-num {
+    color: var(--accent-gold);
+    font-weight: 700;
+  }
+
+  .day-lunar {
+    font-size: 8px;
+    color: var(--text-muted);
+    line-height: 1.3;
+  }
+  .day-cell.today .day-lunar { color: var(--accent-gold); opacity: 0.8; }
+  .day-cell.has-festival .day-lunar { color: var(--festival-red); }
+  .day-cell.has-jieqi .day-lunar { color: var(--jieqi-green); }
+  .day-cell.other-month .day-lunar { opacity: 0.5; }
+
+  /* ── Footer ── */
+  .footer {
+    background: var(--bg-secondary);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .footer-info {
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+  }
+  .today-btn {
+    font-size: 10px;
+    color: var(--accent-gold);
+    background: var(--accent-gold-light);
+    border: 1px solid rgba(166,124,82,0.12);
+    border-radius: 5px;
+    padding: 3px 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+    font-family: 'Noto Sans SC', sans-serif;
+  }
+  .today-btn:hover {
+    background: var(--accent-gold-medium);
+    border-color: var(--accent-gold);
+  }
+
+  /* ── Legend ── */
+  .mockup-labels {
+    margin-top: 28px;
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .label-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #888;
+    font-family: 'Noto Sans SC', sans-serif;
+  }
+  .label-swatch {
+    width: 10px; height: 10px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<div>
+  <div class="app-frame">
+    <!-- Detail Header -->
+    <div class="detail-header">
+      <div class="solar-date">2026年5月29日 星期五</div>
+      <div class="lunar-date">五月初三</div>
+      <div class="ganzhi">丙午年 癸巳月 戊申日</div>
+      <div class="tags">
+        <span class="tag tag-jieqi">芒种将至</span>
+        <span class="tag tag-yi">宜 · 纳采</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Calendar Grid -->
+    <div class="calendar">
+      <div class="month-nav">
+        <button class="nav-btn">◀</button>
+        <span class="month-title">2026年5月</span>
+        <button class="nav-btn">▶</button>
+      </div>
+
+      <div class="grid">
+        <div class="weekday weekend">日</div>
+        <div class="weekday">一</div>
+        <div class="weekday">二</div>
+        <div class="weekday">三</div>
+        <div class="weekday">四</div>
+        <div class="weekday">五</div>
+        <div class="weekday weekend">六</div>
+
+        <!-- Row 1: April overflow -->
+        <div class="day-cell other-month">
+          <div class="day-num">26</div><div class="day-lunar">廿九</div>
+        </div>
+        <div class="day-cell other-month">
+          <div class="day-num">27</div><div class="day-lunar">三十</div>
+        </div>
+        <div class="day-cell other-month">
+          <div class="day-num">28</div><div class="day-lunar">四月初一</div>
+        </div>
+        <div class="day-cell other-month">
+          <div class="day-num">29</div><div class="day-lunar">初二</div>
+        </div>
+        <div class="day-cell other-month">
+          <div class="day-num">30</div><div class="day-lunar">初三</div>
+        </div>
+        <div class="day-cell has-festival">
+          <div class="day-num">1</div><div class="day-lunar">劳动节</div>
+        </div>
+        <div class="day-cell weekend">
+          <div class="day-num">2</div><div class="day-lunar">初六</div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="day-cell weekend">
+          <div class="day-num">3</div><div class="day-lunar">初七</div>
+        </div>
+        <div class="day-cell has-festival">
+          <div class="day-num">4</div><div class="day-lunar">青年节</div>
+        </div>
+        <div class="day-cell has-jieqi">
+          <div class="day-num">5</div><div class="day-lunar">立夏</div>
+        </div>
+        <div class="day-cell">
+          <div class="day-num">6</div><div class="day-lunar">初十</div>
+        </div>
+        <div class="day-cell">
+          <div class="day-num">7</div><div class="day-lunar">十一</div>
+        </div>
+        <div class="day-cell">
+          <div class="day-num">8</div><div class="day-lunar">十二</div>
+        </div>
+        <div class="day-cell weekend">
+          <div class="day-num">9</div><div class="day-lunar">十三</div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="day-cell weekend">
+          <div class="day-num">10</div><div class="day-lunar">十四</div>
+        </div>
+        <div class="day-cell">
+          <div class="day-num">11</div><div class="day-lunar">十五</div>
+        </div>
+        <div class="day-cell">
+          <div class="day-num">12</div><div class="day-lunar">十六</div>
+        </div>
+        <div class="day-cell">
+          <div class="day-num">13</div><div class="day-lunar">十七</div>
+        </div>
+        <div class="day-cell">
+          <div class="day-num">14</div><div class="day-lunar">十八</div>
+        </div>
+        <div class="day-cell">
+          <div class="day-num">15</div><div class="day-lunar">十九</div>
+        </div>
+        <div class="day-cell weekend">
+          <div class="day-num">16</div><div class="day-lunar">二十</div>
+        </div>
+
+        <!-- Row 4 -->
+        <div class="day-cell weekend">
+          <div class="day-num">17</div><div class="day-lunar">廿一</div>
+        </div>
+        <div class="day-cell">
+          <div class="day-num">18</div><div class="day-lunar">廿二</div>
+        </div>
+        <div class="day-cell">
+          <div class="day-num">19</div><div class="day-lunar">廿三</div>
+        </div>
+        <div class="day-cell">
+          <div class="day-num">20</div><div class="day-lunar">廿四</div>
+        </div>
+        <div class="day-cell has-jieqi">
+          <div class="day-num">21</div><div class="day-lunar">小满</div>
+        </div>
+        <div class="day-cell">
+          <div class="day-num">22</div><div class="day-lunar">廿六</div>
+        </div>
+        <div class="day-cell weekend">
+          <div class="day-num">23</div><div class="day-lunar">廿七</div>
+        </div>
+
+        <!-- Row 5: today -->
+        <div class="day-cell weekend">
+          <div class="day-num">24</div><div class="day-lunar">廿八</div>
+        </div>
+        <div class="day-cell">
+          <div class="day-num">25</div><div class="day-lunar">廿九</div>
+        </div>
+        <div class="day-cell">
+          <div class="day-num">26</div><div class="day-lunar">三十</div>
+        </div>
+        <div class="day-cell">
+          <div class="day-num">27</div><div class="day-lunar">五月初一</div>
+        </div>
+        <div class="day-cell">
+          <div class="day-num">28</div><div class="day-lunar">初二</div>
+        </div>
+        <div class="day-cell today">
+          <div class="day-num">29</div><div class="day-lunar">初三</div>
+        </div>
+        <div class="day-cell weekend">
+          <div class="day-num">30</div><div class="day-lunar">初四</div>
+        </div>
+
+        <!-- Row 6 -->
+        <div class="day-cell weekend">
+          <div class="day-num">31</div><div class="day-lunar">初五</div>
+        </div>
+        <div class="day-cell other-month">
+          <div class="day-num">1</div><div class="day-lunar">初六</div>
+        </div>
+        <div class="day-cell other-month">
+          <div class="day-num">2</div><div class="day-lunar">初七</div>
+        </div>
+        <div class="day-cell other-month">
+          <div class="day-num">3</div><div class="day-lunar">初八</div>
+        </div>
+        <div class="day-cell other-month">
+          <div class="day-num">4</div><div class="day-lunar">初九</div>
+        </div>
+        <div class="day-cell other-month has-jieqi">
+          <div class="day-num">5</div><div class="day-lunar">芒种</div>
+        </div>
+        <div class="day-cell other-month">
+          <div class="day-num">6</div><div class="day-lunar">十一</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <span class="footer-info">马月 · 丙午</span>
+      <button class="today-btn">回到今天</button>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="mockup-labels">
+    <div class="label-item">
+      <span class="label-swatch" style="background:var(--accent-gold);"></span>
+      今天
+    </div>
+    <div class="label-item">
+      <span class="label-swatch" style="background:var(--weekend-color);"></span>
+      周末
+    </div>
+    <div class="label-item">
+      <span class="label-swatch" style="background:var(--jieqi-green);"></span>
+      节气
+    </div>
+    <div class="label-item">
+      <span class="label-swatch" style="background:var(--festival-red);"></span>
+      节日
+    </div>
+    <div class="label-item">
+      <span class="label-swatch" style="background:var(--text-muted);"></span>
+      非本月
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
