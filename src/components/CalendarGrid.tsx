@@ -6,6 +6,10 @@ interface CalendarGridProps {
   selectedDate: Date;
   today: Date;
   onSelectDate: (date: Date) => void;
+  viewYear: number;
+  viewMonth: number;
+  onPrevMonth: () => void;
+  onNextMonth: () => void;
 }
 
 const WEEKDAYS = ["日", "一", "二", "三", "四", "五", "六"];
@@ -15,9 +19,18 @@ export function CalendarGrid({
   selectedDate,
   today,
   onSelectDate,
+  viewYear,
+  viewMonth,
+  onPrevMonth,
+  onNextMonth,
 }: CalendarGridProps) {
   return (
     <div className="calendar">
+      <div className="month-nav">
+        <button className="nav-btn" onClick={onPrevMonth}>◀</button>
+        <span className="month-title">{viewYear}年{viewMonth}月</span>
+        <button className="nav-btn" onClick={onNextMonth}>▶</button>
+      </div>
       <div className="grid">
         {WEEKDAYS.map((name, i) => (
           <div

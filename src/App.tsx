@@ -2,7 +2,6 @@ import { ThemeProvider } from "./components/ThemeProvider";
 import { useCalendar } from "./hooks/useCalendar";
 import { DayDetail } from "./components/DayDetail";
 import { CalendarGrid } from "./components/CalendarGrid";
-import { MonthNav } from "./components/MonthNav";
 import { FooterBar } from "./components/FooterBar";
 
 function CalendarApp() {
@@ -28,12 +27,10 @@ function CalendarApp() {
         selectedDate={selectedDate}
         today={today}
         onSelectDate={selectDate}
-      />
-      <MonthNav
-        year={viewYear}
-        month={viewMonth}
-        onPrev={prevMonth}
-        onNext={nextMonth}
+        viewYear={viewYear}
+        viewMonth={viewMonth}
+        onPrevMonth={prevMonth}
+        onNextMonth={nextMonth}
       />
       <div className="divider" />
       {selectedDayInfo && <FooterBar day={selectedDayInfo} onGoToToday={goToToday} />}
