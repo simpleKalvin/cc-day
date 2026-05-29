@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState, type ReactNode } from "react";
 import { listen } from "@tauri-apps/api/event";
-import type { ThemeId } from "../types";
+import type { ThemeId, ThemeMeta } from "../types";
 
 interface ThemeContextValue {
   theme: ThemeId;
@@ -15,6 +15,12 @@ export const ThemeContext = createContext<ThemeContextValue>({
 const STORAGE_KEY = "cc-day-theme";
 
 const VALID_THEMES: ThemeId[] = ["ink-wash", "morandi", "palace"];
+
+export const THEME_LIST: ThemeMeta[] = [
+  { id: "ink-wash", name: "淡墨水彩", description: "水墨淡雅，温润如玉", gradient: "linear-gradient(135deg, #e8e3d8, #f8f5ef)" },
+  { id: "morandi", name: "莫兰迪雅粉", description: "柔雅低饱和，静谧温柔", gradient: "linear-gradient(135deg, #e4ddd4, #f4efe8)" },
+  { id: "palace", name: "赤金宫墙", description: "红墙金瓦，恢弘大气", gradient: "linear-gradient(135deg, #e0d8c8, #faf6f0)" },
+];
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<ThemeId>(() => {

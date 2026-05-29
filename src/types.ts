@@ -31,3 +31,12 @@ export interface ThemeConfig {
   variables: Record<string, string>;
   isBuiltIn?: boolean;
 }
+
+export type PageId = "calendar" | "settings" | "about";
+
+export interface ThemeMeta {
+  id: ThemeId;
+  name: string;
+  description: string;
+  gradient: string;
+}
