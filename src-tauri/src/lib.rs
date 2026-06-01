@@ -3,8 +3,7 @@ mod icon;
 mod show_guard;
 
 #[cfg(target_os = "macos")]
-#[macro_use]
-extern crate objc;
+use objc2::msg_send;
 
 use chrono::{Datelike, Local, Timelike};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -45,11 +44,11 @@ pub fn run() {
 
             #[cfg(target_os = "macos")]
             {
-                let ns_window: cocoa::base::id = window.ns_window().unwrap() as _;
+                use objc2::runtime::AnyObject;
+                let ns_window: *mut AnyObject = window.ns_window().unwrap() as *mut AnyObject;
                 unsafe {
-                    let behavior: cocoa::foundation::NSUInteger =
-                        msg_send![ns_window, collectionBehavior];
-                    let full_screen_aux: cocoa::foundation::NSUInteger = 1 << 8;
+                    let behavior: usize = msg_send![ns_window, collectionBehavior];
+                    let full_screen_aux: usize = 1 << 8;
                     let new_behavior = behavior | full_screen_aux;
                     let _: () = msg_send![ns_window, setCollectionBehavior: new_behavior];
                 }
