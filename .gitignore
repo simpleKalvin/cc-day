@@ -27,6 +27,5 @@ dist-ssr
 .codegraph
 .cursor
 .vscode
-.DS_Store
 .superpowers/
 docs/
