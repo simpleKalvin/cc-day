@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { listen } from "@tauri-apps/api/event";
-import { getCurrentWindow } from "@tauri-apps/api/window";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { useCalendar } from "./hooks/useCalendar";
 import { DayDetail } from "./components/DayDetail";
@@ -55,8 +54,6 @@ function AppContent() {
     const unlisten = listen<string>("navigate-to", async (event) => {
       const pageId = event.payload as PageId;
       setPage(pageId);
-      await getCurrentWindow().show();
-      await getCurrentWindow().setFocus();
     });
     return () => {
       unlisten.then((fn) => fn());
