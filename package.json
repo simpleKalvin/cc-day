@@ -1,8 +1,15 @@
 {
   "name": "cc-day",
-  "private": true,
   "version": "0.1.0",
+  "description": "macOS 菜单栏农历日历",
+  "license": "Apache-2.0",
   "type": "module",
+  "keywords": ["lunar-calendar", "tauri", "tray", "calendar", "chinese-calendar", "macos"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/simpleKalvin/cc-day"
+  },
+  "homepage": "https://github.com/simpleKalvin/cc-day",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
