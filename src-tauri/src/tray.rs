@@ -7,6 +7,9 @@ use tauri::{
 
 use crate::icon::{generate_date_icon, icon_to_tauri_image};
 
+#[cfg(target_os = "macos")]
+use objc2::{class, msg_send};
+
 pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> Result<(), Box<dyn std::error::Error>> {
     let today_day = Local::now().day();
     let icon_img = generate_date_icon(today_day);
@@ -61,8 +64,26 @@ pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> Result<(), Box<dyn 
                         if let Some(flag) = app.try_state::<crate::show_guard::IsShowingFlag>() {
                             flag.will_show();
                         }
-                        let _ = window.show();
-                        let _ = window.set_focus();
+
+                        // macOS: 激活应用并原生显示窗口，确保在全屏应用之上浮现
+                        #[cfg(target_os = "macos")]
+                        {
+                            use objc2::runtime::AnyObject;
+                            let ns_window: *mut AnyObject = window.ns_window().unwrap() as *mut AnyObject;
+                            unsafe {
+                                let ns_app: *mut AnyObject = msg_send![class!(NSApplication), sharedApplication];
+                                let _: () = msg_send![ns_app, activateIgnoringOtherApps: true];
+                                let status_level: i64 = 25;
+                                let _: () = msg_send![ns_window, setLevel: status_level];
+                                let _: () = msg_send![ns_window, makeKeyAndOrderFront: ns_app];
+                            }
+                        }
+
+                        #[cfg(not(target_os = "macos"))]
+                        {
+                            let _ = window.show();
+                            let _ = window.set_focus();
+                        }
                     }
                 }
                 _ => {}

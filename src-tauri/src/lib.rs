@@ -51,6 +51,10 @@ pub fn run() {
                     let full_screen_aux: usize = 1 << 8;
                     let new_behavior = behavior | full_screen_aux;
                     let _: () = msg_send![ns_window, setCollectionBehavior: new_behavior];
+
+                    // NSStatusWindowLevel = 25，与状态栏同级，可浮现在全屏应用之上
+                    let status_level: i64 = 25;
+                    let _: () = msg_send![ns_window, setLevel: status_level];
                 }
             }
 
