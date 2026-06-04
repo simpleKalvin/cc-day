@@ -2,6 +2,8 @@
 
 macOS 菜单栏农历日历。
 
+![CC-Day 截图](.github/assets/screenshot.png)
+
 ## 功能特性
 
 - 动态日期图标 — 托盘图标显示当前日期
