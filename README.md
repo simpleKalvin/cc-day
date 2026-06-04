@@ -17,9 +17,20 @@ macOS 菜单栏农历日历。
 
 ## 安装
 
-前往 [GitHub Releases](https://github.com/simpleKalvin/cc-day/releases) 下载 `.dmg` 安装包。
+前往 [GitHub Releases](https://github.com/simpleKalvin/cc-day/releases) 下载 `.dmg` 安装包，双击打开后拖拽到 Applications 文件夹。
 
-首次打开如遇"无法验证开发者"提示，请右键点击应用 → 选择「打开」。
+### 首次启动
+
+由于应用未经过 Apple 公证，macOS 会阻止直接打开。请按以下步骤操作：
+
+1. 在 Finder 中找到 Applications 文件夹下的 **CC-Day**
+2. **右键点击** CC-Day → 选择「打开」
+3. 在弹出的对话框中再次点击「打开」
+
+> ⚠️ 必须使用**右键 → 打开**的方式，直接双击会被 macOS 拦截。此操作只需执行一次，之后即可正常双击启动。
+
+<!-- 截图占位：首次启动弹窗提示 -->
+![首次启动提示](.github/assets/first-launch.png)
 
 ## 从源码构建
 

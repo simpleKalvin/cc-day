@@ -36,13 +36,31 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install
 
-      - name: Build and release
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build Tauri app
+        run: pnpm tauri build
+
+      - name: Ad-hoc sign macOS app
+        run: |
+          codesign --force --deep --sign - \
+            src-tauri/target/release/bundle/macos/CC-Day.app
+
+      - name: Create signed DMG
+        run: |
+          ARCH=$(uname -m)
+          VERSION=${GITHUB_REF_NAME#v}
+          mkdir -p /tmp/dmg-content
+          cp -R src-tauri/target/release/bundle/macos/CC-Day.app /tmp/dmg-content/
+          ln -sf /Applications /tmp/dmg-content/Applications
+          hdiutil create -volname "CC-Day" \
+            -srcfolder /tmp/dmg-content \
+            -ov -format UDZO \
+            "CC-Day_${VERSION}_${ARCH}.dmg"
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: 'CC-Day ${{ github.ref_name }}'
-          releaseBody: 'See the assets to download this version.'
-          releaseDraft: false
+          name: 'CC-Day ${{ github.ref_name }}'
+          body: 'See the assets to download this version.'
+          draft: false
           prerelease: false
+          files: CC-Day_*.dmg
