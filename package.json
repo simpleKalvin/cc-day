@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "macOS 菜单栏农历日历",
   "license": "Apache-2.0",
+  "packageManager": "pnpm@10.33.0",
   "type": "module",
   "keywords": ["lunar-calendar", "tauri", "tray", "calendar", "chinese-calendar", "macos"],
   "repository": {
